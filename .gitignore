@@ -1,0 +1,6 @@
+.gradle
+build
+.settings
+bin
+*.bin
+*.mt0
