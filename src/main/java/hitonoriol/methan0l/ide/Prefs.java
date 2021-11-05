@@ -45,10 +45,14 @@ public class Prefs implements Serializable {
 		return interpBin;
 	}
 
+	private boolean validate() {
+		return workDir == null || interpBin == null || !new File(workDir).exists() || !new File(interpBin).exists();
+	}
+	
 	public boolean validatePaths() {
-		if (workDir == null || interpBin == null || !new File(workDir).exists() || !new File(interpBin).exists()) {
+		if (validate()) {
 			locateBinary();
-			return validatePaths();
+			return validate();
 		}
 		return true;
 	}

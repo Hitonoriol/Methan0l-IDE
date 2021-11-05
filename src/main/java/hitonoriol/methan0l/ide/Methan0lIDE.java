@@ -6,14 +6,12 @@ import hitonoriol.methan0l.ide.frames.editor.EditorWindow;
 
 public class Methan0lIDE {
 	public static void main(String args[]) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					new EditorWindow();
-					Prefs.init();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		EventQueue.invokeLater(() -> {
+			try {
+				new EditorWindow();
+				Prefs.init();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}

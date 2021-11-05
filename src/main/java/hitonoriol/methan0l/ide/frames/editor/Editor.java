@@ -33,4 +33,8 @@ public class Editor {
 		tab.getFile().save(tab.getText(), false);
 		window.saveFile();
 	}
+	
+	void removeFile(FileEditPanel tab) {
+		currentProject.removeFile(tab.getFile());
+	}
 }

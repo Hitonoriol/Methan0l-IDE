@@ -5,18 +5,22 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 
 import hitonoriol.methan0l.ide.Prefs;
 import hitonoriol.methan0l.ide.lang.Methan0lTokenMaker;
+import hitonoriol.methan0l.ide.run.Methan0lProgram;
 
 public class EditorWindow {
 	private Editor editor = new Editor(this);
@@ -31,6 +35,7 @@ public class EditorWindow {
 	private JMenuItem saveFileMn;
 	private JMenu systemMenu;
 	private JMenuItem locateBinMn;
+	private JMenuItem interModeMn;
 
 	static {
 		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
@@ -51,7 +56,9 @@ public class EditorWindow {
 	}
 
 	void loadFile(SourceFile file) {
-		getProjectTabs().addTab(file.getName(), null, new FileEditPanel(file), null);
+		Component newTab = new FileEditPanel(file);
+		projectTabs.addTab(file.getName(), null, newTab, null);
+		projectTabs.setSelectedComponent(newTab);
 	}
 
 	void saveFile() {
@@ -117,6 +124,7 @@ public class EditorWindow {
 		if (projMenu == null) {
 			projMenu = new JMenu("Project");
 			projMenu.add(getRunProjMI());
+			projMenu.add(getInterModeMn());
 		}
 		return projMenu;
 	}
@@ -138,6 +146,17 @@ public class EditorWindow {
 	JTabbedPane getProjectTabs() {
 		if (projectTabs == null) {
 			projectTabs = new JTabbedPane(JTabbedPane.TOP);
+			projectTabs.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					final int idx = projectTabs.getUI().tabForCoordinate(projectTabs, e.getX(), e.getY());
+					if (SwingUtilities.isMiddleMouseButton(e)) {
+						FileEditPanel tab = (FileEditPanel) projectTabs.getComponentAt(idx);
+						editor.removeFile(tab);
+						projectTabs.removeTabAt(idx);
+					}
+				}
+			});
 		}
 		return projectTabs;
 	}
@@ -176,5 +195,17 @@ public class EditorWindow {
 			});
 		}
 		return locateBinMn;
+	}
+
+	private JMenuItem getInterModeMn() {
+		if (interModeMn == null) {
+			interModeMn = new JMenuItem("Interactive mode");
+			interModeMn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					new Methan0lProgram().run();
+				}
+			});
+		}
+		return interModeMn;
 	}
 }

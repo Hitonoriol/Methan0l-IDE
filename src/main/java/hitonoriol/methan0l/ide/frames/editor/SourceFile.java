@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.google.common.io.Files;
+import org.apache.commons.io.FileUtils;
 
 import hitonoriol.methan0l.ide.Dialogs;
 import hitonoriol.methan0l.ide.Prefs;
@@ -38,7 +38,7 @@ public class SourceFile {
 
 	public String read() {
 		try {
-			return Files.asCharSource(file, Charset.defaultCharset()).read();
+			return FileUtils.readFileToString(file, Charset.defaultCharset());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Dialogs.error("Failed to read " + file.getName());
@@ -59,12 +59,12 @@ public class SourceFile {
 	}
 
 	public void run() {
-		if (!Prefs.values().validatePaths())
+		if (!Prefs.values().validatePaths() || !isValid())
 			return;
-		
+
 		new Methan0lProgram(this).run();
 	}
-	
+
 	public static String createTempName() {
 		File file = new File(NEW_FILE);
 		int i = 0;
@@ -88,7 +88,10 @@ public class SourceFile {
 			if (!fname.endsWith(EXT))
 				file = new File(fname + "." + EXT);
 
-			Files.asCharSink(file, Charset.defaultCharset()).write(contents);
+			FileUtils.write(file, contents, Charset.defaultCharset());
+
+			if (saveAs)
+				this.file = file;
 		} catch (Exception e) {
 			e.printStackTrace();
 			Dialogs.error("Failed to save " + file.getName());

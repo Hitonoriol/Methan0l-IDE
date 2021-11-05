@@ -4,7 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.nio.CharBuffer;
+import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -30,9 +34,8 @@ public class ConsoleWindow extends JFrame {
 	}
 
 	private void createContents() {
-		setMinimumSize(new Dimension(350, 300));
+		setMinimumSize(new Dimension(600, 400));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -41,7 +44,36 @@ public class ConsoleWindow extends JFrame {
 		contentPane.add(getInputField(), BorderLayout.SOUTH);
 		pack();
 		setVisible(true);
+
+		/* Re-focus input field if typing is detected */
+		getProgramOutput().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				char chr = e.getKeyChar();
+				if (!isPrintable(chr))
+					return;
+
+				inputField.setText(inputField.getText() + chr);
+				EventQueue.invokeLater(() -> inputField.requestFocusInWindow());
+			}
+		});
+
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {
+				program.stop();
+			}
+		});
 	}
+
+	private boolean isPrintable(char c) {
+		Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+		return (!Character.isISOControl(c)) &&
+				c != KeyEvent.CHAR_UNDEFINED &&
+				block != null &&
+				block != Character.UnicodeBlock.SPECIALS;
+	}
+
+	private CharBuffer tempBuf = CharBuffer.allocate(0x1000);
 
 	public boolean appendLine(BufferedReader reader) {
 		try {
@@ -49,6 +81,9 @@ public class ConsoleWindow extends JFrame {
 			if ((line = reader.readLine()) != null) {
 				appendLine(line);
 				return true;
+			} else if (reader.ready()) {
+				reader.read(tempBuf);
+				appendLine(tempBuf.toString());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -58,6 +93,11 @@ public class ConsoleWindow extends JFrame {
 
 	public void appendLine(String line) {
 		programOutput.append(line + System.lineSeparator());
+		programOutput.setCaretPosition(programOutput.getDocument().getLength());
+	}
+
+	public void executionFinished() {
+		inputField.setEnabled(false);
 	}
 
 	private JScrollPane getScrollPane() {
@@ -70,6 +110,7 @@ public class ConsoleWindow extends JFrame {
 	private JTextArea getProgramOutput() {
 		if (programOutput == null) {
 			programOutput = new JTextArea();
+			programOutput.setFocusTraversalKeysEnabled(false);
 			programOutput.setEditable(false);
 		}
 		return programOutput;
@@ -83,8 +124,8 @@ public class ConsoleWindow extends JFrame {
 				public void keyPressed(KeyEvent e) {
 					if (e.getKeyCode() != KeyEvent.VK_ENTER)
 						return;
-					
-					program.sendInput(inputField.getText());
+
+					program.sendInput(inputField.getText() + System.lineSeparator());
 					inputField.setText("");
 				}
 			});
