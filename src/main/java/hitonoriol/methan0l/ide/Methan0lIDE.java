@@ -8,6 +8,7 @@ public class Methan0lIDE {
 	public static void main(String args[]) {
 		EventQueue.invokeLater(() -> {
 			try {
+				Util.setSystemUIStyle();
 				new EditorWindow();
 				Prefs.init();
 			} catch (Exception e) {
