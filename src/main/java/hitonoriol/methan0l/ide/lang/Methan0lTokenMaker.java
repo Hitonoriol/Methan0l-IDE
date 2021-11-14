@@ -16,7 +16,9 @@ public class Methan0lTokenMaker extends AbstractTokenMaker {
 	public TokenMap getWordsToHighlight() {
 		TokenMap tokenMap = new TokenMap();
 		tokenMap.put("if", Token.RESERVED_WORD);
+		tokenMap.put("else", Token.RESERVED_WORD);
 		tokenMap.put("do", Token.RESERVED_WORD);
+		tokenMap.put("return", Token.RESERVED_WORD);
 		tokenMap.put("class", Token.RESERVED_WORD);
 		tokenMap.put("box", Token.RESERVED_WORD);
 		tokenMap.put("typeid", Token.RESERVED_WORD);
@@ -98,12 +100,6 @@ public class Methan0lTokenMaker extends AbstractTokenMaker {
 					addToken(text, currentTokenStart, i - 1, Token.WHITESPACE, newStartOffset + currentTokenStart);
 					currentTokenStart = i;
 					currentTokenType = Token.LITERAL_STRING_DOUBLE_QUOTE;
-					break;
-
-				case '#':
-					addToken(text, currentTokenStart, i - 1, Token.WHITESPACE, newStartOffset + currentTokenStart);
-					currentTokenStart = i;
-					currentTokenType = Token.COMMENT_EOL;
 					break;
 
 				default:

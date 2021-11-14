@@ -19,9 +19,12 @@ public class SourceFile {
 	private File file;
 
 	private static JFileChooser fileChooser = new JFileChooser();
+	private static JFileChooser dirChooser = new JFileChooser();
 	static {
 		fileChooser.setCurrentDirectory(Paths.get(".").toFile());
 		fileChooser.setFileFilter(new FileNameExtensionFilter("Methan0l source file", EXT));
+		dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		dirChooser.setAcceptAllFileFilterUsed(false);
 	}
 
 	public SourceFile() {
@@ -107,5 +110,14 @@ public class SourceFile {
 			return null;
 
 		return new SourceFile(file);
+	}
+
+	public static File chooseDirectory() {
+		dirChooser.showDialog(null, "Choose directory");
+		return dirChooser.getSelectedFile();
+	}
+	
+	public static JFileChooser getFileChooser() {
+		return fileChooser;
 	}
 }

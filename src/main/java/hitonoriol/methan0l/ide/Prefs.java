@@ -11,6 +11,8 @@ import javax.swing.JFileChooser;
 
 import org.apache.commons.io.FilenameUtils;
 
+import hitonoriol.methan0l.ide.frames.editor.SourceFile;
+
 public class Prefs implements Serializable {
 	private static final long serialVersionUID = -3239797926127336797L;
 	private static final File prefFile = new File("prefs.bin");
@@ -25,6 +27,7 @@ public class Prefs implements Serializable {
 			try (FileInputStream fStr = new FileInputStream(prefFile);
 					ObjectInputStream oStr = new ObjectInputStream(fStr)) {
 				instance = (Prefs) oStr.readObject();
+				SourceFile.getFileChooser().setCurrentDirectory(new File(instance.getWorkDir()));
 			} catch (Exception e) {
 				e.printStackTrace();
 				Dialogs.error("Couldn't load preference file");
@@ -48,7 +51,7 @@ public class Prefs implements Serializable {
 	private boolean validate() {
 		return workDir == null || interpBin == null || !new File(workDir).exists() || !new File(interpBin).exists();
 	}
-	
+
 	public boolean validatePaths() {
 		if (validate()) {
 			locateBinary();
@@ -75,7 +78,13 @@ public class Prefs implements Serializable {
 		save();
 	}
 
+	public void setWorkDir(String path) {
+		workDir = path;
+		save();
+	}
+
 	public void save() {
+		SourceFile.getFileChooser().setCurrentDirectory(new File(workDir));
 		try (FileOutputStream ofStr = new FileOutputStream(prefFile);
 				ObjectOutputStream ooStr = new ObjectOutputStream(ofStr)) {
 			ooStr.writeObject(instance);
@@ -96,4 +105,5 @@ public class Prefs implements Serializable {
 	public static Prefs values() {
 		return instance;
 	}
+
 }
