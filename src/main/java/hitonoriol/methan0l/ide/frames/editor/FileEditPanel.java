@@ -3,13 +3,13 @@ package hitonoriol.methan0l.ide.frames.editor;
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import hitonoriol.methan0l.ide.lang.Methan0lTokenMaker;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class FileEditPanel extends JPanel {
 	private EditorWindow window;
@@ -28,6 +28,23 @@ public class FileEditPanel extends JPanel {
 
 		if (file.isValid())
 			readFile();
+
+		textArea.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				modify();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				modify();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+			}
+		});
 	}
 
 	private RTextScrollPane getScrollPane() {
@@ -40,24 +57,14 @@ public class FileEditPanel extends JPanel {
 	private RSyntaxTextArea getTextArea() {
 		if (textArea == null) {
 			textArea = new RSyntaxTextArea();
-			textArea.addKeyListener(new KeyAdapter() {
-				@Override
-				public void keyTyped(KeyEvent e) {
-					if (isPrintable(e.getKeyChar()))
-						window.textModified(true);
-				}
-			});
 			textArea.setSyntaxEditingStyle(Methan0lTokenMaker.STYLE_NAME);
 		}
 		return textArea;
 	}
 
-	private static boolean isPrintable(char c) {
-		Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
-		return (!Character.isISOControl(c)) &&
-				c != KeyEvent.CHAR_UNDEFINED &&
-				block != null &&
-				block != Character.UnicodeBlock.SPECIALS;
+	private void modify() {
+		if (window != null)
+			window.textModified(true);
 	}
 
 	public SourceFile getFile() {
