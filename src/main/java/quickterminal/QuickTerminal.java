@@ -2,8 +2,6 @@ package quickterminal;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
@@ -36,17 +34,18 @@ public class QuickTerminal extends JFrame {
 		pack();
 		setLocationRelativeTo(null);
 		setVisible(true);
-
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent we) {
-				console.getCommand().stop();
-			}
-		});
 	}
 	
 	public ConsolePane getConsole() {
 		if (console == null)
 			console = new ConsolePane(cmd);
 		return console;
+	}
+	
+	@Override
+	public void dispose() {
+		System.out.println("Killing methan0l process...");
+		console.getCommand().stop();
+		super.dispose();
 	}
 }

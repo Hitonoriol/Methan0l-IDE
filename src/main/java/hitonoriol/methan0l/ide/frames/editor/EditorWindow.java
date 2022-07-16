@@ -5,10 +5,13 @@ import static javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
@@ -145,6 +148,13 @@ public class EditorWindow {
 		frame.getContentPane().add(getMenuBar(), BorderLayout.NORTH);
 		frame.getContentPane().add(getProjectTabs(), BorderLayout.CENTER);
 		frame.setVisible(true);
+		
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {
+				for (Window window : Window.getWindows())
+					window.dispose();
+			}
+		});
 	}
 
 	void textModified(boolean modified) {
@@ -193,7 +203,7 @@ public class EditorWindow {
 	}
 
 	private static String getKeystrokeString(KeyStroke stroke) {
-		String str = stroke.toString().replace("pressed", "+");
+		String str = stroke.toString().replace("pressed", "+").replace(" ", "");
 		str = Character.toUpperCase(str.charAt(0)) + str.substring(1);
 		return str;
 	}
