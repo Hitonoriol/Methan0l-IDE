@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 
 import hitonoriol.methan0l.ide.Dialogs;
 import hitonoriol.methan0l.ide.Prefs;
+import hitonoriol.methan0l.ide.Resources;
 import hitonoriol.methan0l.ide.run.Methan0lProgram;
 
 public class SourceFile {
@@ -41,7 +42,7 @@ public class SourceFile {
 
 	public String read() {
 		try {
-			return FileUtils.readFileToString(file, Charset.defaultCharset());
+			return FileUtils.readFileToString(file, Resources.UTF8);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Dialogs.error("Failed to read " + file.getName());

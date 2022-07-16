@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.StringJoiner;
 
+import hitonoriol.methan0l.ide.Resources;
+
 public class ProcessRunner extends Thread {
 	private List<String> cmds;
 	private CommandListener listener;
@@ -20,7 +22,7 @@ public class ProcessRunner extends Thread {
 	public void run() {
 		try {
 			ProcessBuilder pb = new ProcessBuilder(cmds);
-			pb.redirectErrorStream();
+			pb.redirectErrorStream(true);
 			process = pb.start();
 			StreamReader reader = new StreamReader(listener, process.getInputStream());
 
@@ -42,7 +44,7 @@ public class ProcessRunner extends Thread {
 
 	public void write(String text) throws IOException {
 		if (process != null && process.isAlive()) {
-			process.getOutputStream().write(text.getBytes());
+			process.getOutputStream().write(text.getBytes(Resources.UTF8));
 			process.getOutputStream().flush();
 		}
 	}
