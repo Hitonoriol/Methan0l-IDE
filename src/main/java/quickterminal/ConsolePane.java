@@ -3,8 +3,6 @@ package quickterminal;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -31,32 +29,36 @@ public class ConsolePane extends JPanel implements CommandListener, Terminal {
 		((AbstractDocument) textArea.getDocument()).setDocumentFilter(new ProtectedDocumentFilter(this));
 		add(new JScrollPane(textArea));
 
-		// InputMap im = textArea.getInputMap(WHEN_FOCUSED);
 		ActionMap am = textArea.getActionMap();
-
 		Action oldAction = am.get("insert-break");
 		am.put("insert-break", new AbstractAction() {
 			private static final long serialVersionUID = 1322810617331608502L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int range = textArea.getCaretPosition() - userInputStart;
 				try {
-					String text = textArea.getText(userInputStart, range).trim();
-					System.out.println("[" + text + "]");
-					userInputStart += range;
+					int caretPos = textArea.getCaretPosition();
+					int lineEnd = textArea.getLineEndOffset(textArea.getLineOfOffset(caretPos));
+					int range = lineEnd - userInputStart;
+					String text = textArea.getText(userInputStart, range);
+					System.out.printf("User input: `%s`\n", text);
+
+					userInputStart = lineEnd;
 					if (!cmd.isRunning()) {
 						return;
 					} else {
 						try {
-							cmd.send(text + "\n");
+							cmd.send(text + System.lineSeparator());
 						} catch (IOException ex) {
-							appendText("!! Failed to send command to process: " + ex.getMessage() + "\n");
+							printError("Failed to send command to process: " + ex.getMessage());
+							ex.printStackTrace();
 						}
 					}
 				} catch (BadLocationException ex) {
-					Logger.getLogger(QuickTerminal.class.getName()).log(Level.SEVERE, null, ex);
+					printError("Bad console caret location");
+					ex.printStackTrace();
 				}
+				resetCaret();
 				oldAction.actionPerformed(e);
 			}
 		});
@@ -65,12 +67,13 @@ public class ConsolePane extends JPanel implements CommandListener, Terminal {
 
 	@Override
 	public void commandOutput(String text) {
-		SwingUtilities.invokeLater(new AppendTask(this, text));
+		SwingUtilities.invokeLater(() -> appendText(text));
 	}
 
 	@Override
 	public void commandFailed(Exception exp) {
-		SwingUtilities.invokeLater(new AppendTask(this, "Command failed - " + exp.getMessage()));
+		SwingUtilities.invokeLater(
+				() -> printError("Something broke when passing your input to the process: " + exp.getMessage()));
 	}
 
 	@Override
@@ -78,20 +81,26 @@ public class ConsolePane extends JPanel implements CommandListener, Terminal {
 		if (result == 0)
 			return;
 
-		appendText("\n[Program exited with code " + result + "]\n");
-		appendText("\n");
+		appendText("\n[Program exited with code " + result + "]\n\n");
+	}
+
+	private void resetCaret() {
+		textArea.setCaretPosition(textArea.getText().length());
 	}
 
 	protected void updateUserInputPos() {
 		int pos = textArea.getCaretPosition();
-		textArea.setCaretPosition(textArea.getText().length());
+		resetCaret();
 		userInputStart = pos;
-
 	}
 
 	@Override
 	public int getUserInputStart() {
 		return userInputStart;
+	}
+
+	private void printError(String text) {
+		appendText("[IDE error] " + text + System.lineSeparator());
 	}
 
 	@Override
