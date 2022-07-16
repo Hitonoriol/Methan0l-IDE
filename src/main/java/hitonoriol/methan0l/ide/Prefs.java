@@ -1,5 +1,6 @@
 package hitonoriol.methan0l.ide;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,7 +28,8 @@ public class Prefs implements Serializable {
 			try (FileInputStream fStr = new FileInputStream(prefFile);
 					ObjectInputStream oStr = new ObjectInputStream(fStr)) {
 				instance = (Prefs) oStr.readObject();
-				SourceFile.getFileChooser().setCurrentDirectory(new File(instance.getWorkDir()));
+				EventQueue.invokeLater(
+						() -> SourceFile.getFileChooser().setCurrentDirectory(new File(instance.getWorkDir())));
 			} catch (Exception e) {
 				e.printStackTrace();
 				Dialogs.error("Couldn't load preference file");
