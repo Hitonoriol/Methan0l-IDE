@@ -6,6 +6,10 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -13,6 +17,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -155,8 +160,31 @@ public class EditorWindow {
 					window.dispose();
 			}
 		});
+		
+		frame.setDropTarget(createDndTarget());
 	}
 
+	DropTarget createDndTarget() {
+		return new DropTarget() {
+			private static final long serialVersionUID = -6103476608564601103L;
+
+			@SuppressWarnings("unchecked")
+			public synchronized void drop(DropTargetDropEvent evt) {
+				try {
+					evt.acceptDrop(DnDConstants.ACTION_COPY);
+					List<File> droppedFiles = (List<File>) evt
+							.getTransferable()
+							.getTransferData(DataFlavor.javaFileListFlavor);
+					for (File file : droppedFiles)
+						editor.loadFile(new SourceFile(file));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					Dialogs.error("Unsupported drag-and-drop object");
+				}
+			}
+		};
+	}
+	
 	void textModified(boolean modified) {
 		FileEditPanel tab = getCurrentTab();
 		if (tab.modified() == modified)
@@ -338,5 +366,9 @@ public class EditorWindow {
 			setAction(closeMn, closeTabAction);
 		}
 		return closeMn;
+	}
+	
+	JFrame getFrame() {
+		return frame;
 	}
 }

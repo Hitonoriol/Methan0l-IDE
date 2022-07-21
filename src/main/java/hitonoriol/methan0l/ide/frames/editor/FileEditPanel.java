@@ -29,6 +29,7 @@ public class FileEditPanel extends JPanel {
 		if (file.isValid())
 			readFile();
 
+		textArea.setDropTarget(window.createDndTarget());
 		textArea.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
@@ -42,8 +43,7 @@ public class FileEditPanel extends JPanel {
 			}
 
 			@Override
-			public void changedUpdate(DocumentEvent e) {
-			}
+			public void changedUpdate(DocumentEvent e) {}
 		});
 	}
 
