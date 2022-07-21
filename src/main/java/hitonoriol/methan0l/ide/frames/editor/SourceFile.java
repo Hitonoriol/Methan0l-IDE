@@ -1,7 +1,6 @@
 package hitonoriol.methan0l.ide.frames.editor;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 
 import javax.swing.JFileChooser;
@@ -11,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 
 import hitonoriol.methan0l.ide.Dialogs;
 import hitonoriol.methan0l.ide.Prefs;
-import hitonoriol.methan0l.ide.Resources;
 import hitonoriol.methan0l.ide.run.Methan0lProgram;
 
 public class SourceFile {
@@ -42,7 +40,7 @@ public class SourceFile {
 
 	public String read() {
 		try {
-			return FileUtils.readFileToString(file, Resources.UTF8);
+			return FileUtils.readFileToString(file, Prefs.UTF8);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Dialogs.error("Failed to read " + file.getName());
@@ -92,7 +90,7 @@ public class SourceFile {
 			if (!fname.endsWith(EXT))
 				file = new File(fname + "." + EXT);
 
-			FileUtils.write(file, contents, Charset.defaultCharset());
+			FileUtils.write(file, contents, Prefs.UTF8);
 
 			if (saveAs)
 				this.file = file;

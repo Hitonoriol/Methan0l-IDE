@@ -3,7 +3,7 @@ package quickterminal;
 import java.io.IOException;
 import java.io.InputStream;
 
-import hitonoriol.methan0l.ide.Resources;
+import hitonoriol.methan0l.ide.Prefs;
 
 public class StreamReader extends Thread {
 
@@ -24,7 +24,7 @@ public class StreamReader extends Thread {
 			int len = 0;
 			byte[] buffer = new byte[BUFFER_CAP];
 			while ((len = is.read(buffer)) > 0)
-				listener.commandOutput(new String(buffer, 0, len, Resources.UTF8));
+				listener.commandOutput(new String(buffer, 0, len, Prefs.UTF8));
 		} catch (IOException exp) {
 			exp.printStackTrace();
 		}

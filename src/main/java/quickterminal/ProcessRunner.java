@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.StringJoiner;
 
-import hitonoriol.methan0l.ide.Resources;
+import hitonoriol.methan0l.ide.Prefs;
 
 public class ProcessRunner extends Thread {
 	private List<String> cmds;
@@ -44,7 +44,7 @@ public class ProcessRunner extends Thread {
 
 	public void write(String text) throws IOException {
 		if (process != null && process.isAlive()) {
-			process.getOutputStream().write(text.getBytes(Resources.UTF8));
+			process.getOutputStream().write(text.getBytes(Prefs.UTF8));
 			process.getOutputStream().flush();
 		}
 	}

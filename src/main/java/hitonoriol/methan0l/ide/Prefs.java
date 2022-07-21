@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 import javax.swing.JFileChooser;
 
@@ -16,6 +17,9 @@ import hitonoriol.methan0l.ide.frames.editor.SourceFile;
 
 public class Prefs implements Serializable {
 	private static final long serialVersionUID = -3239797926127336797L;
+	
+	public final static Charset UTF8 = Charset.forName("utf8");
+	
 	private static final File prefFile = new File("prefs.bin");
 
 	private String workDir;
