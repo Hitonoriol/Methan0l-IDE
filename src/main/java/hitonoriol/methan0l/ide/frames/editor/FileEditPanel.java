@@ -9,6 +9,7 @@ import javax.swing.event.DocumentListener;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
+import hitonoriol.methan0l.ide.Bindings;
 import hitonoriol.methan0l.ide.lang.Methan0lTokenMaker;
 
 public class FileEditPanel extends JPanel {
@@ -29,6 +30,8 @@ public class FileEditPanel extends JPanel {
 		if (file.isValid())
 			readFile();
 
+		Bindings.setupFontScaling(textArea);
+		
 		textArea.setDropTarget(window.createDndTarget());
 		textArea.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -46,7 +49,7 @@ public class FileEditPanel extends JPanel {
 			public void changedUpdate(DocumentEvent e) {}
 		});
 	}
-
+	
 	private RTextScrollPane getScrollPane() {
 		if (scrollPane == null) {
 			scrollPane = new RTextScrollPane(getTextArea());

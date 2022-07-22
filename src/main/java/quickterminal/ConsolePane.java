@@ -14,6 +14,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 
+import hitonoriol.methan0l.ide.Bindings;
+
 public class ConsolePane extends JPanel implements CommandListener, Terminal {
 	private static final long serialVersionUID = 8965534740814016152L;
 	private JTextArea textArea;
@@ -26,6 +28,7 @@ public class ConsolePane extends JPanel implements CommandListener, Terminal {
 
 		setLayout(new BorderLayout());
 		textArea = new JTextArea(25, 100);
+		Bindings.setupFontScaling(textArea);
 		((AbstractDocument) textArea.getDocument()).setDocumentFilter(new ProtectedDocumentFilter(this));
 		add(new JScrollPane(textArea));
 
