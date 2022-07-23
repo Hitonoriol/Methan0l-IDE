@@ -38,6 +38,8 @@ import hitonoriol.methan0l.ide.Dialogs;
 import hitonoriol.methan0l.ide.Prefs;
 import hitonoriol.methan0l.ide.lang.Methan0lTokenMaker;
 import hitonoriol.methan0l.ide.run.Methan0lProgram;
+import quickterminal.Command;
+import quickterminal.CommandReader;
 
 public class EditorWindow {
 	private Editor editor = new Editor(this);
@@ -56,6 +58,8 @@ public class EditorWindow {
 	private JMenuItem setWDMn;
 	private JMenuItem closeMn;
 
+	private final static String TITLE = "Methan0l IDE";
+	
 	static {
 		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
 		atmf.putMapping(Methan0lTokenMaker.STYLE_NAME, Methan0lTokenMaker.class.getCanonicalName());
@@ -147,11 +151,12 @@ public class EditorWindow {
 	}
 
 	private void initialize() {
-		frame = new JFrame("Methan0l IDE");
+		frame = new JFrame(TITLE);
 		frame.setMinimumSize(new Dimension(450, 500));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(getMenuBar(), BorderLayout.NORTH);
 		frame.getContentPane().add(getProjectTabs(), BorderLayout.CENTER);
+		parseVersionString();
 		frame.setVisible(true);
 		
 		frame.addWindowListener(new WindowAdapter() {
@@ -183,6 +188,20 @@ public class EditorWindow {
 				}
 			}
 		};
+	}
+	
+	private static final String VERSION_REGEX = ".*v\\d+\\..*[\\r\\n]*";
+
+	private void parseVersionString() {
+		CommandReader reader = new CommandReader(out -> {
+			out.ifPresent(outStr -> frame
+					.setTitle(TITLE
+							+ " ["
+							+ (outStr.matches(VERSION_REGEX) ? out.get() : "Unknown methan0l version")
+							+ "]"));
+		});
+		Command executor = new Command(reader);
+		executor.execute(Prefs.values().getBinaryPath() + " --version");
 	}
 	
 	void textModified(boolean modified) {
@@ -338,6 +357,7 @@ public class EditorWindow {
 			locateBinMn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					Prefs.values().locateBinary();
+					parseVersionString();
 				}
 			});
 		}

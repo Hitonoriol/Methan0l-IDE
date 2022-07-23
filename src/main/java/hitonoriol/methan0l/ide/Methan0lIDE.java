@@ -9,8 +9,8 @@ public class Methan0lIDE {
 		EventQueue.invokeLater(() -> {
 			try {
 				Util.setSystemUIStyle();
-				new EditorWindow();
 				Prefs.init();
+				new EditorWindow();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
